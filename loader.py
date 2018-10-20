@@ -14,10 +14,10 @@ def load_sentences(path, lower, zeros):
     sentences = []
     sentence = []
     num = 0
-    for line in codecs.open(path, 'r', 'utf8'):
+    for line in open(path, 'r', encoding='utf-8'):
         num+=1
         line = zero_digits(line.rstrip()) if zeros else line.rstrip()
-        # print(list(line))
+        #print(list(line))
         if not line:
             if len(sentence) > 0:
                 if 'DOCSTART' not in sentence[0][0]:
@@ -30,7 +30,7 @@ def load_sentences(path, lower, zeros):
                 # word[0] = " "
             else:
                 word= line.split()
-            assert len(word) >= 2, print([word[0]])
+            assert len(word) >= 2, print(num,[word[0]])
             sentence.append(word)
     if len(sentence) > 0:
         if 'DOCSTART' not in sentence[0][0]:
@@ -84,6 +84,7 @@ def tag_mapping(sentences):
     tags = [[char[-1] for char in s] for s in sentences]
     dico = create_dico(tags)
     tag_to_id, id_to_tag = create_mapping(dico)
+    print(dico)
     print("Found %i unique named entity tags" % len(dico))
     return dico, tag_to_id, id_to_tag
 

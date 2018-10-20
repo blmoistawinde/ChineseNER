@@ -271,5 +271,7 @@ class Model(object):
         trans = self.trans.eval()
         lengths, scores = self.run_step(sess, False, inputs)
         batch_paths = self.decode(scores, lengths, trans)
+        # print(batch_paths)
+        # print(id_to_tag)
         tags = [id_to_tag[idx] for idx in batch_paths[0]]
         return result_to_json(inputs[0][0], tags)

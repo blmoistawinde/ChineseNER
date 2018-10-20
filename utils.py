@@ -55,7 +55,7 @@ def test_ner(results, path):
     Run perl script to evaluate model
     """
     output_file = os.path.join(path, "ner_predict.utf8")
-    with open(output_file, "w") as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         to_write = []
         for block in results:
             for line in block:
@@ -134,7 +134,7 @@ def load_config(config_file):
     Load configuration of the model
     parameters are stored in json format
     """
-    with open(config_file, encoding="utf8") as f:
+    with open(config_file, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -191,21 +191,28 @@ def result_to_json(string, tags):
     entity_name = ""
     entity_start = 0
     idx = 0
+    last_tag,last_type = "0",""             # My modification to support the "BIO" tags
     for char, tag in zip(string, tags):
         if tag[0] == "S":
             item["entities"].append({"word": char, "start": idx, "end": idx+1, "type":tag[2:]})
         elif tag[0] == "B":
             entity_name += char
             entity_start = idx
+            last_type = tag[2:]
         elif tag[0] == "I":
             entity_name += char
+            last_type = tag[2:]
         elif tag[0] == "E":
             entity_name += char
             item["entities"].append({"word": entity_name, "start": entity_start, "end": idx + 1, "type": tag[2:]})
             entity_name = ""
         else:
+            if last_tag in ["B","I"]:
+                item["entities"].append({"word": entity_name, "start": entity_start, "end": idx, "type": last_type})
+            else:
+                entity_start = idx
             entity_name = ""
-            entity_start = idx
+        last_tag = tag[0]
         idx += 1
     return item
 
